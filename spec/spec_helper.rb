@@ -25,6 +25,7 @@ end
 
 module SpecHelper
   def run_defined_feature
+    setup_world
     define_steps
     features = load_features(self.class.feature_content || raise("No feature content defined!"))
     run(features)
@@ -48,12 +49,25 @@ module SpecHelper
     tree_walker.visit_features(features)
   end
 
+  def dsl
+    unless @dsl
+      rb = step_mother.load_programming_language('rb')
+      @dsl = Object.new
+      @dsl.extend Cucumber::RbSupport::RbDsl
+    end
+    @dsl
+  end
+
   def define_steps
     return unless step_defs = self.class.step_defs
-    rb = step_mother.load_programming_language('rb')
-    dsl = Object.new
-    dsl.extend Cucumber::RbSupport::RbDsl
     dsl.instance_exec &step_defs
+  end
+
+  def setup_world
+    dsl.instance_exec do
+      Butternut.setup_hooks(self)
+      World(Butternut::Helpers)
+    end
   end
 end
 

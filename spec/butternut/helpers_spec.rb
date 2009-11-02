@@ -12,7 +12,8 @@ module Butternut
         :as_xml => "<cheese>pepperjack</cheese>",
         :getWebResponse => @stub_response
       })
-      @stub_element = stub("fake element", :value= => nil, :select => nil, :click => nil)
+      @stub_element = stub("fake element", :value= => nil, :select => nil, :click => nil, :exist? => true)
+      @stub_empty = stub("fake empty element", :exist? => false)
 
       @stub_browser = stub("fake celerity browser", {
         :goto => @stub_page, :page => @stub_page,
@@ -54,16 +55,30 @@ module Butternut
 
     describe "#current_page_source" do
       before(:each) { define_stub_chain }
-      it do
+
+      it "returns the current page's source" do
         @stub_page.should_receive(:as_xml).and_return("pants")
         current_page_source.should == "pants"
+      end
+
+      it "returns nil if page is nil" do
+        @stub_browser.stub!(:page).and_return(nil)
+        current_page_source.should be_nil
       end
     end
 
     describe "#fill_in" do
       before(:each) { define_stub_chain }
-      it do
+
+      it "should find by label" do
         @stub_browser.should_receive(:text_field).with(:label, "pants").and_return(@stub_element)
+        @stub_element.should_receive(:value=).with("khakis")
+        fill_in("pants", :with => "khakis")
+      end
+
+      it "should find by name" do
+        @stub_browser.should_receive(:text_field).with(:label, "pants").and_return(@stub_empty)
+        @stub_browser.should_receive(:text_field).with(:name, "pants").and_return(@stub_element)
         @stub_element.should_receive(:value=).with("khakis")
         fill_in("pants", :with => "khakis")
       end
@@ -76,8 +91,16 @@ module Butternut
 
     describe "#select" do
       before(:each) { define_stub_chain }
-      it do
+
+      it "should find by label" do
         @stub_browser.should_receive(:select_list).with(:label, "pants").and_return(@stub_element)
+        @stub_element.should_receive(:select).with("khakis")
+        select("khakis", :from => "pants")
+      end
+
+      it "should find by name" do
+        @stub_browser.should_receive(:select_list).with(:label, "pants").and_return(@stub_empty)
+        @stub_browser.should_receive(:select_list).with(:name, "pants").and_return(@stub_element)
         @stub_element.should_receive(:select).with("khakis")
         select("khakis", :from => "pants")
       end

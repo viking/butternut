@@ -14,17 +14,24 @@ module Butternut
     end
 
     def current_page_source
-      browser.page.as_xml
+      browser.page ? browser.page.as_xml : nil
     end
 
-    def fill_in(label_for_text_field, options = {})
-      browser.text_field(:label, label_for_text_field).value = options[:with]
-      @page_changed = true
+    # Fill in a text field with a value
+    def fill_in(label_or_name, options = {})
+      elt = find_element_by_label_or_name(:text_field, label_or_name)
+      if elt.exist?
+        elt.value = options[:with]
+        @page_changed = true
+      end
     end
 
     def select(option_text, options = {})
-      browser.select_list(:label, options[:from]).select(option_text)
-      @page_changed = true
+      elt = find_element_by_label_or_name(:select_list, options[:from])
+      if elt.exist?
+        elt.select(option_text)
+        @page_changed = true
+      end
     end
 
     def click_button(button_value)
@@ -34,6 +41,11 @@ module Butternut
 
     def page_changed?
       @page_changed
+    end
+
+    def find_element_by_label_or_name(type, label_or_name)
+      elt = browser.send(type, :label, label_or_name)
+      elt.exist? ? elt : browser.send(type, :name, label_or_name)
     end
   end
 end

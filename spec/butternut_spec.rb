@@ -1,18 +1,53 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Butternut do
-  extend SpecHelperDsl
-  include SpecHelper
+  describe "running a scenario" do
+    extend SpecHelperDsl
+    include SpecHelper
 
-  describe "saving html snapshots after each step" do
-    describe "given the page changes" do
+    describe "saving page sources" do
       define_steps do
-        Given("blargh") { }
+        Given('waffles') do
+          visit("file://" + File.expand_path(File.dirname(__FILE__) + "/fixtures/foo.txt"))
+        end
+        AfterStep do |scenario|
+          begin
+            scenario.page_sources[0].should match(/Foo/)
+          rescue Exception => e
+            p e
+          end
+        end
       end
 
       define_feature <<-FEATURE
-        Scenario: omg
-          Given blargh
+        Feature: Pants
+
+        Scenario: Roffle waffles
+          Given waffles
+      FEATURE
+
+      it { run_defined_feature }
+    end
+
+    describe "resetting page_changed" do
+      define_steps do
+        Given('waffles') do
+          visit("file://" + File.expand_path(File.dirname(__FILE__) + "/fixtures/foo.txt"))
+        end
+        AfterStep do |scenario|
+          begin
+            page_changed?.should be_false
+          rescue Exception => e
+            p e
+          end
+        end
+      end
+
+      define_feature <<-FEATURE
+        Feature: Pants
+
+        Scenario: Roffle waffles
+          Given waffles
       FEATURE
 
       it { run_defined_feature }
