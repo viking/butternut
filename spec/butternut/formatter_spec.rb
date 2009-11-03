@@ -215,9 +215,8 @@ module Butternut
 
       it do
         step = @doc.at('.feature .scenario .step.passed')
-        iframe = step.at('iframe')
-        iframe.should_not be_nil
-        iframe['src'].should match(%r{^file:///tmp/})
+        link = step.at('a[href^="file:///tmp/"]')
+        link.should_not be_nil
       end
     end
 
@@ -225,7 +224,7 @@ module Butternut
       before(:each) do
         tmpdir = File.join(File.dirname(__FILE__), "..", "..", "tmp")
         setup_formatter({:formats => [
-          ['Butternut::Formatter', File.join(tmpdir, "huge.html")]
+          ['Butternut::Formatter', File.join(tmpdir, "posts", "huge.html")]
         ]})
         run_defined_feature
         @doc = Nokogiri.HTML(@out.string)
@@ -244,9 +243,9 @@ module Butternut
 
       it do
         step = @doc.at('.feature .scenario .step.passed')
-        iframe = step.at('iframe')
-        iframe.should_not be_nil
-        iframe['src'].should match(%r{^butternut.+\.html})
+        link = step.at("a")
+        link.should_not be_nil
+        link['href'].should match(%r{^\.\./features/#{Date.today.to_s}/butternut.+\.html})
       end
     end
   end

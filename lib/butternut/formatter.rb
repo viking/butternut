@@ -1,11 +1,16 @@
 require 'cucumber/formatter/ordered_xml_markup'
 require 'cucumber/formatter/duration'
 require 'tmpdir'
+require 'fileutils'
 
 module Butternut
   class Formatter
     include ERB::Util # for the #h method
     include Cucumber::Formatter::Duration
+
+    # FIXME: this is obviously not nominal, but I have no way of
+    #        accepting additional options from Cucumber at present
+    FEATURES_DIR_PARTS = %w{.. features}
 
     def initialize(step_mother, io, options)
       @io = io
@@ -16,9 +21,24 @@ module Butternut
       if @options && @options[:formats]
         format = @options[:formats].detect { |(name, _)| underscore(name) == "butternut/formatter" }
         if format && format[1]
-          @out_dir = File.dirname(File.expand_path(format[1]))
+          base_dir = File.dirname(File.expand_path(format[1]))
+          features_dir = File.expand_path(File.join(base_dir, *FEATURES_DIR_PARTS))
+
+          if File.exist?(features_dir)
+            today = Date.today.to_s
+
+            @source_output_dir = File.join(features_dir, today)
+            @source_html_path  = (FEATURES_DIR_PARTS + [today]).join("/")
+            if !File.exist?(@source_output_dir)
+              FileUtils.mkdir(@source_output_dir)
+            end
+          else
+            $stderr.puts "Directory not found: #{features_dir}"
+          end
         end
       end
+      @source_output_dir ||= Dir.tmpdir
+      @source_html_path  ||= "file://" + Dir.tmpdir
     end
 
     def before_features(features)
@@ -227,11 +247,12 @@ module Butternut
           if @feature_element.respond_to?(:page_sources)
             source = @feature_element.page_sources.last
             if source
-              path = temp_name(@out_dir || Dir.tmpdir)
+              path = source_file_name
               File.open(path, "w") { |f| f.print(source) }
 
-              html_path = @out_dir ? File.basename(path) : "file://" + path
-              builder.iframe({:src => html_path}) { }
+              builder.a({:href => "#{@source_html_path}/#{File.basename(path)}"}) do
+                builder << "Page source"
+              end
             end
           end
         end
@@ -367,11 +388,11 @@ module Butternut
       Cucumber::Formatter::OrderedXmlMarkup.new(:target => io, :indent => 0)
     end
 
-    def temp_name(dir)
+    def source_file_name
       t = Time.now.strftime("%Y%m%d")
       path = nil
       while path.nil?
-        path = File.join(dir, "butternut#{t}-#{$$}-#{rand(0x100000000).to_s(36)}.html")
+        path = File.join(@source_output_dir, "butternut#{t}-#{$$}-#{rand(0x100000000).to_s(36)}.html")
         path = nil if File.exist?(path)
       end
       path
