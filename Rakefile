@@ -10,6 +10,8 @@ begin
     gem.email = "viking415@gmail.com"
     gem.homepage = "http://github.com/viking/butternut"
     gem.authors = ["Jeremy Stephens"]
+    gem.add_dependency "cucumber", ">= 0.4.0"
+    gem.add_dependency "celerity"
     gem.add_development_dependency "rspec", ">= 1.2.9"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
@@ -42,4 +44,9 @@ Rake::RDocTask.new do |rdoc|
   rdoc.title = "butternut #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+desc 'Generate the css for the html formatter from sass'
+task :sass do
+  sh 'sass -t expanded lib/cucumber/formatter/cucumber.sass > lib/cucumber/formatter/cucumber.css'
 end

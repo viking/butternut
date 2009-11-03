@@ -21,7 +21,6 @@ module Butternut
           if object.is_a?(Cucumber::Ast::Scenario)
             object.page_sources << (page_changed? ? current_page_source : nil)
             @page_changed = false
-            p object.page_sources.collect(&:class)
           end
         rescue Exception => e
           p e

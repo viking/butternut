@@ -1,5 +1,6 @@
 require 'cucumber/formatter/ordered_xml_markup'
 require 'cucumber/formatter/duration'
+require 'tmpdir'
 
 module Butternut
   class Formatter
@@ -11,6 +12,13 @@ module Butternut
       @options = options
       @buffer = {}
       @current_builder = create_builder(@io)
+
+      if @options && @options[:formats]
+        format = @options[:formats].detect { |(name, _)| underscore(name) == "butternut/formatter" }
+        if format && format[1]
+          @out_dir = File.dirname(File.expand_path(format[1]))
+        end
+      end
     end
 
     def before_features(features)
@@ -118,6 +126,7 @@ module Butternut
 
     def before_feature_element(feature_element)
       start_buffering :feature_element
+      @feature_element = feature_element
     end
 
     def after_feature_element(feature_element)
@@ -131,6 +140,7 @@ module Butternut
         builder << buffer(:feature_element)
       end
       @open_step_list = true
+      @feature_element = nil
     end
 
     def scenario_name(keyword, name, file_colon_line, source_indent)
@@ -180,7 +190,7 @@ module Butternut
 
     def after_steps(steps)
       stop_buffering :steps
-      builder.ol do
+      builder.table do
         builder << buffer(:steps)
       end
     end
@@ -209,8 +219,22 @@ module Butternut
     def after_step_result(keyword, step_match, multiline_arg, status, exception, source_indent, background)
       stop_buffering :step_result
       return if @hide_this_step
-      builder.li(:id => @step_id, :class => "step #{status}") do
-        builder << buffer(:step_result)
+      builder.tr(:id => @step_id, :class => "step #{status}") do
+        builder.td do
+          builder << buffer(:step_result)
+        end
+        builder.td do
+          if @feature_element.respond_to?(:page_sources)
+            source = @feature_element.page_sources.last
+            if source
+              path = temp_name(@out_dir || Dir.tmpdir)
+              File.open(path, "w") { |f| f.print(source) }
+
+              html_path = @out_dir ? File.basename(path) : "file://" + path
+              builder.iframe({:src => html_path}) { }
+            end
+          end
+        end
       end
     end
 
@@ -341,6 +365,25 @@ module Butternut
 
     def create_builder(io)
       Cucumber::Formatter::OrderedXmlMarkup.new(:target => io, :indent => 0)
+    end
+
+    def temp_name(dir)
+      t = Time.now.strftime("%Y%m%d")
+      path = nil
+      while path.nil?
+        path = File.join(dir, "butternut#{t}-#{$$}-#{rand(0x100000000).to_s(36)}.html")
+        path = nil if File.exist?(path)
+      end
+      path
+    end
+
+    # Snagged from active_support
+    def underscore(camel_cased_word)
+      camel_cased_word.to_s.gsub(/::/, '/').
+        gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+        gsub(/([a-z\d])([A-Z])/,'\1_\2').
+        tr("-", "_").
+        downcase
     end
   end
 end

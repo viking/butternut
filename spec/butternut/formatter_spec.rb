@@ -12,17 +12,24 @@ module Butternut
       end
     end
 
-    before(:each) do
+    def setup_formatter(options = {})
       @out = StringIO.new
-      @formatter = Butternut::Formatter.new(step_mother, @out, {})
+      @formatter = Butternut::Formatter.new(step_mother, @out, options)
     end
 
-    it "should not raise an error when visiting a blank feature name" do
-      lambda { @formatter.feature_name("") }.should_not raise_error
+    describe "visiting blank feature name" do
+      before(:each) do
+        setup_formatter
+      end
+
+      it "should not raise an error when visiting a blank feature name" do
+        lambda { @formatter.feature_name("") }.should_not raise_error
+      end
     end
 
     describe "given a single feature" do
       before(:each) do
+        setup_formatter
         run_defined_feature
         @doc = Nokogiri.HTML(@out.string)
       end
@@ -136,7 +143,7 @@ module Butternut
              | g | h |
         FEATURE
 
-        it { @doc.css('td').length.should == 8 }
+        it { @doc.css('tr.step td table tr td').length.should == 8 }
       end
 
       describe "with a py string in the background and the scenario" do
@@ -165,7 +172,7 @@ module Butternut
         define_feature(<<-FEATURE)
           Scenario: Monkey gets a fright
             Given boo
-          FEATURE
+        FEATURE
 
         it { @doc.should have_css_node('.feature .scenario .step.failed', /eek/) }
       end
@@ -186,7 +193,61 @@ module Butternut
         it { @doc.should_not have_css_node('.feature .scenario .step.failed', //) }
         it { @doc.should have_css_node('.feature .scenario .step.undefined', /yay/) }
       end
+    end
 
+    describe "displaying page source to stdout" do
+      before(:each) do
+        setup_formatter
+        run_defined_feature
+        @doc = Nokogiri.HTML(@out.string)
+      end
+
+      define_steps do
+        Given(/foo/) do
+          visit("file://" + File.expand_path(File.dirname(__FILE__) + "/../fixtures/foo.html"))
+        end
+      end
+
+      define_feature(<<-FEATURE)
+        Scenario: Monkey goes to the zoo
+          Given foo
+      FEATURE
+
+      it do
+        step = @doc.at('.feature .scenario .step.passed')
+        iframe = step.at('iframe')
+        iframe.should_not be_nil
+        iframe['src'].should match(%r{^file:///tmp/})
+      end
+    end
+
+    describe "displaying page source to file" do
+      before(:each) do
+        tmpdir = File.join(File.dirname(__FILE__), "..", "..", "tmp")
+        setup_formatter({:formats => [
+          ['Butternut::Formatter', File.join(tmpdir, "huge.html")]
+        ]})
+        run_defined_feature
+        @doc = Nokogiri.HTML(@out.string)
+      end
+
+      define_steps do
+        Given(/foo/) do
+          visit("file://" + File.expand_path(File.dirname(__FILE__) + "/../fixtures/foo.html"))
+        end
+      end
+
+      define_feature(<<-FEATURE)
+        Scenario: Monkey goes to the zoo
+          Given foo
+      FEATURE
+
+      it do
+        step = @doc.at('.feature .scenario .step.passed')
+        iframe = step.at('iframe')
+        iframe.should_not be_nil
+        iframe['src'].should match(%r{^butternut.+\.html})
+      end
     end
   end
 end

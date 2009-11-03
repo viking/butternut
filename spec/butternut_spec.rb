@@ -5,10 +5,10 @@ describe Butternut do
     extend SpecHelperDsl
     include SpecHelper
 
-    describe "saving page sources" do
+    describe "saving last page source" do
       define_steps do
         Given('waffles') do
-          visit("file://" + File.expand_path(File.dirname(__FILE__) + "/fixtures/foo.txt"))
+          visit("file://" + File.expand_path(File.dirname(__FILE__) + "/fixtures/foo.html"))
         end
         AfterStep do |scenario|
           begin
@@ -20,8 +20,6 @@ describe Butternut do
       end
 
       define_feature <<-FEATURE
-        Feature: Pants
-
         Scenario: Roffle waffles
           Given waffles
       FEATURE
@@ -44,8 +42,6 @@ describe Butternut do
       end
 
       define_feature <<-FEATURE
-        Feature: Pants
-
         Scenario: Roffle waffles
           Given waffles
       FEATURE
