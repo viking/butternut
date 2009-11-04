@@ -5,21 +5,16 @@ require 'celerity'
 module Butternut
   def self.setup_hooks(obj)
     obj.instance_exec do
-      Before do |object|
-        begin
-          if object.is_a?(Cucumber::Ast::Scenario)
-            object.page_sources = []
-          end
-        rescue Exception => e
-          p e
-          pp caller
-        end
-      end
-
       AfterStep do |object|
         begin
           if object.is_a?(Cucumber::Ast::Scenario)
-            object.page_sources << (page_changed? ? current_page_source : nil)
+            if page_changed?
+              object.last_page_source = current_page_source
+              object.last_page_url    = current_url
+            else
+              object.last_page_source = nil
+              object.last_page_url    = nil
+            end
             @page_changed = false
           end
         rescue Exception => e

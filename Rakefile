@@ -12,6 +12,7 @@ begin
     gem.authors = ["Jeremy Stephens"]
     gem.add_dependency "cucumber", ">= 0.4.0"
     gem.add_dependency "celerity"
+    gem.add_dependency "nokogiri"
     gem.add_development_dependency "rspec", ">= 1.2.9"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
@@ -48,5 +49,5 @@ end
 
 desc 'Generate the css for the html formatter from sass'
 task :sass do
-  sh 'sass -t expanded lib/cucumber/formatter/cucumber.sass > lib/cucumber/formatter/cucumber.css'
+  sh 'sass -t expanded lib/butternut/cucumber.sass > lib/butternut/cucumber.css'
 end

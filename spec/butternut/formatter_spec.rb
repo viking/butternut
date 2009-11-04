@@ -17,6 +17,16 @@ module Butternut
       @formatter = Butternut::Formatter.new(step_mother, @out, options)
     end
 
+    def most_recent_html_file(dir)
+      path = Pathname.new(dir)
+      files = path.entries.collect { |file|
+        path+file
+      }.sort { |file1,file2|
+        file2.mtime <=> file1.mtime
+      }
+      files.detect { |f| f.to_s =~ /\.html$/ }
+    end
+
     describe "visiting blank feature name" do
       before(:each) do
         setup_formatter
@@ -222,9 +232,9 @@ module Butternut
 
     describe "displaying page source to file" do
       before(:each) do
-        tmpdir = File.join(File.dirname(__FILE__), "..", "..", "tmp")
+        @tmpdir = File.join(File.dirname(__FILE__), "..", "..", "tmp")
         setup_formatter({:formats => [
-          ['Butternut::Formatter', File.join(tmpdir, "posts", "huge.html")]
+          ['Butternut::Formatter', File.join(@tmpdir, "main", "huge.html")]
         ]})
         run_defined_feature
         @doc = Nokogiri.HTML(@out.string)
@@ -241,11 +251,20 @@ module Butternut
           Given foo
       FEATURE
 
-      it do
+      it "links to the page source and rewrites urls" do
         step = @doc.at('.feature .scenario .step.passed')
         link = step.at("a")
         link.should_not be_nil
-        link['href'].should match(%r{^\.\./features/#{Date.today.to_s}/butternut.+\.html})
+        file = link['href']
+        file.should match(%r{^\.\./features/#{Date.today.to_s}/butternut.+\.html})
+      end
+
+      it "saves images and stylesheets and rewrites urls in page source" do
+        dir = File.join(@tmpdir, "features", Date.today.to_s)
+        file = most_recent_html_file(dir)
+        doc = Nokogiri.HTML(open(file).read)
+        doc.at('img')['src'].should == "picard.jpg"
+        doc.at('link[rel="stylesheet"]')['href'].should == "foo.css"
       end
     end
   end

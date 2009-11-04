@@ -2,6 +2,9 @@ require 'cucumber/formatter/ordered_xml_markup'
 require 'cucumber/formatter/duration'
 require 'tmpdir'
 require 'fileutils'
+require 'nokogiri'
+require 'uri'
+require 'open-uri'
 
 module Butternut
   class Formatter
@@ -20,7 +23,7 @@ module Butternut
 
       if @options && @options[:formats]
         format = @options[:formats].detect { |(name, _)| underscore(name) == "butternut/formatter" }
-        if format && format[1]
+        if format && format[1].is_a?(String)
           base_dir = File.dirname(File.expand_path(format[1]))
           features_dir = File.expand_path(File.join(base_dir, *FEATURES_DIR_PARTS))
 
@@ -244,11 +247,13 @@ module Butternut
           builder << buffer(:step_result)
         end
         builder.td do
-          if @feature_element.respond_to?(:page_sources)
-            source = @feature_element.page_sources.last
-            if source
+          if @feature_element.respond_to?(:last_page_source)
+            page_source = @feature_element.last_page_source
+            if page_source
+              page_url = @feature_element.last_page_url
+              page_source = transform_page_source(page_source, page_url)
               path = source_file_name
-              File.open(path, "w") { |f| f.print(source) }
+              File.open(path, "w") { |f| f.print(page_source) }
 
               builder.a({:href => "#{@source_html_path}/#{File.basename(path)}"}) do
                 builder << "Page source"
@@ -405,6 +410,44 @@ module Butternut
         gsub(/([a-z\d])([A-Z])/,'\1_\2').
         tr("-", "_").
         downcase
+    end
+
+    def transform_page_source(page_source, page_url)
+      page_uri = URI.parse(page_url)
+      page_uri.query = nil
+      page_uri.path = File.dirname(page_uri.path)
+      page_url = page_uri.to_s
+
+      collected_files = []
+
+      doc = Nokogiri.HTML(page_source)
+      { 'img' => 'src',
+        'link[rel=stylesheet]' => 'href'
+      }.each_pair do |selector, attr|
+        doc.css(selector).each do |elt|
+          elt_url = elt[attr]
+          next  if elt_url.nil?
+
+          elt_url.gsub!('\\"', "")
+          next  if elt_url.empty?
+          next  if collected_files.index(elt_url)
+
+          basename    = File.basename(elt_url)
+          local_file  = File.join(@source_output_dir, basename)
+          remote_file = case elt_url
+                        when %r{^\w+://} then elt_url
+                        else
+                          elt_url.sub!(/^\//, "")
+                          page_url + "/" + elt_url
+                        end
+          File.open(local_file, "w") { |f| f.write open(remote_file).read }
+          collected_files << elt_url
+
+          elt[attr] = basename
+        end
+      end
+
+      doc.to_s
     end
   end
 end

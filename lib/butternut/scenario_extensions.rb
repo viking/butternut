@@ -1,6 +1,6 @@
 module Butternut
   module ScenarioExtensions
-    attr_accessor :page_sources
+    attr_accessor :last_page_source, :last_page_url
   end
 end
 
