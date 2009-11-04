@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "butternut"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{A Cucumber formatter that uses Celerity to capture HTML sources (JRuby)}
+    gem.description = %Q{Based on Cucumber's HTML formatter, Butternut uses Celerity to capture page sources after each step.}
     gem.email = "viking415@gmail.com"
     gem.homepage = "http://github.com/viking/butternut"
     gem.authors = ["Jeremy Stephens"]

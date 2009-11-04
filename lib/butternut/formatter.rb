@@ -213,7 +213,7 @@ module Butternut
 
     def after_steps(steps)
       stop_buffering :steps
-      builder.table do
+      builder.ol do
         builder << buffer(:steps)
       end
     end
@@ -242,11 +242,11 @@ module Butternut
     def after_step_result(keyword, step_match, multiline_arg, status, exception, source_indent, background)
       stop_buffering :step_result
       return if @hide_this_step
-      builder.tr(:id => @step_id, :class => "step #{status}") do
-        builder.td do
+      builder.li(:id => @step_id, :class => "step #{status}") do
+        builder.div do
           builder << buffer(:step_result)
         end
-        builder.td do
+        builder.div(:class => "page") do
           if @feature_element.respond_to?(:last_page_source)
             page_source = @feature_element.last_page_source
             if page_source
@@ -255,8 +255,8 @@ module Butternut
               path = source_file_name
               File.open(path, "w") { |f| f.print(page_source) }
 
-              builder.a({:href => "#{@source_html_path}/#{File.basename(path)}"}) do
-                builder << "Page source"
+              builder.a({:target => "_blank", :href => "#{@source_html_path}/#{File.basename(path)}"}) do
+                builder.span(:class => "icon-show") { builder << "" }
               end
             end
           end
@@ -312,7 +312,7 @@ module Butternut
     def after_table_row(table_row)
       stop_buffering :table_row
       return if @hide_this_step
-      builder.tr(:id => @row_id) do
+      builder.table(:id => @row_id) do
         builder << buffer(:table_row)
       end
       if table_row.exception
@@ -365,7 +365,7 @@ module Butternut
     end
 
     def format_exception(exception)
-      h((["#{exception.message} (#{exception.class})"] + exception.backtrace).join("\n"))
+      (["#{exception.message} (#{exception.class})"] + exception.backtrace).join("\n")
     end
 
     def builder
@@ -446,6 +446,17 @@ module Butternut
           elt[attr] = basename
         end
       end
+
+      # disable links
+      doc.css('a').each do |link|
+        link['href'] = "#"
+      end
+
+      # turn off scripts
+      doc.css('script').each { |s| s.unlink }
+
+      # disable form elements
+      doc.css('input, select, textarea').each { |x| x['disabled'] = 'disabled' }
 
       doc.to_s
     end

@@ -25,8 +25,8 @@
 !undefined_text = #2A1B0A
 
 .cucumber
-  :font-family "Lucida Grande", Helvetica, sans-serif
-  :font-size 0.8em
+  :font-family Verdana, Arial, sans-serif
+  :font-size 15px
   :background white
   :padding 1em
 
@@ -100,8 +100,13 @@
     li
       :margin 0em 0em 0em 1em
       :padding 0em 0em 0em 0.2em
+      :position relative
       span.param
         :font-weight bold
+      div.page
+        :position absolute
+        :right 0
+        :top 0
     li.failed
       :border-left= !step_left !failed_dark
       :border-bottom= !step_bottom !failed_dark
@@ -137,3 +142,11 @@
       :color= !undefined_text
       span.param
         :background= !undefined_dark
+
+  .icon-show
+    :background-image url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1gkWFgcEIFayvAAAAB10RVh0Q29tbWVudABDcmVhdGVkIHdpdGggVGhlIEdJTVDvZCVuAAABsElEQVQ4y6WSS2sTURzFf3c6giWktRql7roLqIv5CA1FtBtdpC+6cVGQItFvIz6w0l1F+gG6qa0WxFUIgQhu0hJd9arptJ1mHr33uhgbcjsJFjybC//nOf97xJPK8q6UcoJzKBQKX188f3Wbf8CVUk5UKo9wnKFu8CTo8GZl7RYXgAsQxyG7e00wBmMMN67fBGB2vmwGNY6NXdl+/XKl5AKEYUQQnKQZA99/tJgp3yOKIwQOCGE1x3HCxsanyS6DXjQae/h+ANT7bh4fv4rn3bEl9ML3A96/Wx+oeW5hJnsDpRRJEluHbLd/9dF9DYAkSewBWmvSV3UTtVotM6BUmiK9WcceEEUhnU5oFXuex4W/ceiSSxwlVmJn5yNvV1dRSmWaNje/kMvlWFicWxOz82WTz+eRUlpFDx/cpVgsMjKS50zmqTrFGDBa8WHrM9VqPWXw7OkSxmQ9c3zs02w2EOd8ADB9f4pqtS7d1DuGVutbX42O42RiWmsODnyAIxeg/fsno6MFi8XZVpuY+RsTHB76AL54vLy0tb8vJ9PJA62P44geBobh4ctHWutF/hd/AExBukCW3MYjAAAAAElFTkSuQmCC)
+    :background-repeat no-repeat
+    :float left
+    :width 16px
+    :height 16px
+    :display block

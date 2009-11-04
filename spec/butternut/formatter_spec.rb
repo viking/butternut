@@ -153,7 +153,7 @@ module Butternut
              | g | h |
         FEATURE
 
-        it { @doc.css('tr.step td table tr td').length.should == 8 }
+        it { @doc.css('td').length.should == 8 }
       end
 
       describe "with a py string in the background and the scenario" do
@@ -238,6 +238,10 @@ module Butternut
         ]})
         run_defined_feature
         @doc = Nokogiri.HTML(@out.string)
+
+        dir = File.join(@tmpdir, "features", Date.today.to_s)
+        file = most_recent_html_file(dir)
+        @page_doc = Nokogiri.HTML(open(file).read)
       end
 
       define_steps do
@@ -251,7 +255,7 @@ module Butternut
           Given foo
       FEATURE
 
-      it "links to the page source and rewrites urls" do
+      it "links to the page source" do
         step = @doc.at('.feature .scenario .step.passed')
         link = step.at("a")
         link.should_not be_nil
@@ -260,11 +264,24 @@ module Butternut
       end
 
       it "saves images and stylesheets and rewrites urls in page source" do
-        dir = File.join(@tmpdir, "features", Date.today.to_s)
-        file = most_recent_html_file(dir)
-        doc = Nokogiri.HTML(open(file).read)
-        doc.at('img')['src'].should == "picard.jpg"
-        doc.at('link[rel="stylesheet"]')['href'].should == "foo.css"
+        @page_doc.at('img')['src'].should == "picard.jpg"
+        @page_doc.at('link[rel="stylesheet"]')['href'].should == "foo.css"
+      end
+
+      it "turns off links" do
+        @page_doc.css('a').each do |link|
+          link['href'].should == "#"
+        end
+      end
+
+      it "turns off scripts" do
+        @page_doc.css('script').length.should == 0
+      end
+
+      it "disables form elements" do
+        @page_doc.css('input, select, textarea').each do |elt|
+          elt['disabled'].should == "disabled"
+        end
       end
     end
   end

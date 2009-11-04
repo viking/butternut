@@ -1,132 +1,112 @@
 
 
 .cucumber {
-  font-family: "Lucida Grande", Helvetica, sans-serif;
-  font-size: 0.8em;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 15px;
   background: white;
-  padding: 1em;
-}
-.cucumber h1, .cucumber h2, .cucumber h3, .cucumber h4, .cucumber ol, .cucumber li, .cucumber pre, .cucumber p {
-  font-size: 1em;
-  padding: 0px;
-  margin: 0px;
-}
-.cucumber div.feature {
-  border: 1px solid;
-  padding: 2px;
-  margin: 4px;
-}
-.cucumber div.feature div.background, .cucumber div.feature div.scenario, .cucumber div.feature p {
-  padding: 0em 0em 0em 1em;
-}
-.cucumber div.feature div.background div.examples, .cucumber div.feature div.scenario div.examples, .cucumber div.feature p div.examples {
-  padding: 0em 0em 0em 1em;
-}
-.cucumber .stats {
-  margin: 2em;
-}
-.cucumber .summary ul.features li {
-  display: inline;
-}
-.cucumber .backtrace {
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-left: 1em;
-}
-.cucumber a {
-  text-decoration: none;
-  color: inherit;
-}
-.cucumber a:hover {
-  text-decoration: underline;
-}
-.cucumber a:visited {
-  font-weight: normal;
-}
-.cucumber a div.examples {
-  border: 1px solid;
-  padding: 2px;
-  margin: 4px;
-}
-.cucumber table {
-  border-collapse: collapse;
-}
-.cucumber table td, .cucumber table th {
-  font-size: 1em;
-  border: 1px solid #AAAAAA;
-}
-.cucumber table td.failed {
-  background: #FFC0CB;
-  color: #8B0000;
-}
-.cucumber table td.passed {
-  background: #98FB98;
-  color: #001111;
-}
-.cucumber table td.skipped {
-  background: #e0ffff;
-  color: #001111;
-}
-.cucumber table td.pending {
-  background: #FFFFE0;
-  color: #111100;
-}
-.cucumber table td.undefined {
-  background: #FFFFE0;
-  color: #111100;
-}
-.cucumber ol {
-  list-style: none;
-}
-.cucumber ol li {
-  margin: 0em 0em 0em 1em;
-  padding: 0em 0em 0em 0.2em;
-}
-.cucumber ol li span.param {
-  font-weight: bold;
-}
-.cucumber ol li.failed {
-  border-left: 5px solid red;
-  border-bottom: 1px solid red;
-  background: #ffc0cb;
-  color: #8b0000;
-}
-.cucumber ol li.failed span.param {
-  background: !failed_dark;
-}
-.cucumber ol li.passed {
-  border-left: 5px solid lime;
-  border-bottom: 1px solid lime;
-  background: #98fb98;
-  color: #001111;
-}
-.cucumber ol li.passed span.param {
-  background: lime;
-}
-.cucumber ol li.skipped {
-  border-left: 5px solid aqua;
-  border-bottom: 1px solid aqua;
-  background: #e0ffff;
-  color: #001111;
-}
-.cucumber ol li.skipped span.param {
-  background: aqua;
-}
-.cucumber ol li.pending {
-  border-left: 5px solid #ff8000;
-  border-bottom: 1px solid #ff8000;
-  background: yellow;
-  color: #2a1b0a;
-}
-.cucumber ol li.pending span.param {
-  background: #ff8000;
-}
-.cucumber ol li.undefined {
-  border-left: 5px solid #ff8000;
-  border-bottom: 1px solid #ff8000;
-  background: yellow;
-  color: #2a1b0a;
-}
-.cucumber ol li.undefined span.param {
-  background: #ff8000;
-}
+  padding: 1em; }
+  .cucumber h1, .cucumber h2, .cucumber h3, .cucumber h4, .cucumber ol, .cucumber li, .cucumber pre, .cucumber p {
+    font-size: 1em;
+    padding: 0px;
+    margin: 0px; }
+  .cucumber div.feature {
+    border: 1px solid;
+    padding: 2px;
+    margin: 4px; }
+    .cucumber div.feature div.background, .cucumber div.feature div.scenario, .cucumber div.feature p {
+      padding: 0em 0em 0em 1em; }
+      .cucumber div.feature div.background div.examples, .cucumber div.feature div.scenario div.examples, .cucumber div.feature p div.examples {
+        padding: 0em 0em 0em 1em; }
+  .cucumber .stats {
+    margin: 2em; }
+  .cucumber .summary ul.features li {
+    display: inline; }
+  .cucumber .backtrace {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 1em; }
+  .cucumber a {
+    text-decoration: none;
+    color: inherit; }
+    .cucumber a:hover {
+      text-decoration: underline; }
+    .cucumber a:visited {
+      font-weight: normal; }
+    .cucumber a div.examples {
+      border: 1px solid;
+      padding: 2px;
+      margin: 4px; }
+  .cucumber table {
+    border-collapse: collapse; }
+    .cucumber table td, .cucumber table th {
+      font-size: 1em;
+      border: 1px solid #AAAAAA; }
+    .cucumber table td.failed {
+      background: #FFC0CB;
+      color: #8B0000; }
+    .cucumber table td.passed {
+      background: #98FB98;
+      color: #001111; }
+    .cucumber table td.skipped {
+      background: #e0ffff;
+      color: #001111; }
+    .cucumber table td.pending {
+      background: #FFFFE0;
+      color: #111100; }
+    .cucumber table td.undefined {
+      background: #FFFFE0;
+      color: #111100; }
+  .cucumber ol {
+    list-style: none; }
+    .cucumber ol li {
+      margin: 0em 0em 0em 1em;
+      padding: 0em 0em 0em 0.2em;
+      position: relative; }
+      .cucumber ol li span.param {
+        font-weight: bold; }
+      .cucumber ol li div.page {
+        position: absolute;
+        right: 0;
+        top: 0; }
+    .cucumber ol li.failed {
+      border-left: 5px solid red;
+      border-bottom: 1px solid red;
+      background: #ffc0cb;
+      color: #8b0000; }
+      .cucumber ol li.failed span.param {
+        background: !failed_dark; }
+    .cucumber ol li.passed {
+      border-left: 5px solid lime;
+      border-bottom: 1px solid lime;
+      background: #98fb98;
+      color: #001111; }
+      .cucumber ol li.passed span.param {
+        background: lime; }
+    .cucumber ol li.skipped {
+      border-left: 5px solid aqua;
+      border-bottom: 1px solid aqua;
+      background: #e0ffff;
+      color: #001111; }
+      .cucumber ol li.skipped span.param {
+        background: aqua; }
+    .cucumber ol li.pending {
+      border-left: 5px solid #ff8000;
+      border-bottom: 1px solid #ff8000;
+      background: yellow;
+      color: #2a1b0a; }
+      .cucumber ol li.pending span.param {
+        background: #ff8000; }
+    .cucumber ol li.undefined {
+      border-left: 5px solid #ff8000;
+      border-bottom: 1px solid #ff8000;
+      background: yellow;
+      color: #2a1b0a; }
+      .cucumber ol li.undefined span.param {
+        background: #ff8000; }
+  .cucumber .icon-show {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1gkWFgcEIFayvAAAAB10RVh0Q29tbWVudABDcmVhdGVkIHdpdGggVGhlIEdJTVDvZCVuAAABsElEQVQ4y6WSS2sTURzFf3c6giWktRql7roLqIv5CA1FtBtdpC+6cVGQItFvIz6w0l1F+gG6qa0WxFUIgQhu0hJd9arptJ1mHr33uhgbcjsJFjybC//nOf97xJPK8q6UcoJzKBQKX188f3Wbf8CVUk5UKo9wnKFu8CTo8GZl7RYXgAsQxyG7e00wBmMMN67fBGB2vmwGNY6NXdl+/XKl5AKEYUQQnKQZA99/tJgp3yOKIwQOCGE1x3HCxsanyS6DXjQae/h+ANT7bh4fv4rn3bEl9ML3A96/Wx+oeW5hJnsDpRRJEluHbLd/9dF9DYAkSewBWmvSV3UTtVotM6BUmiK9WcceEEUhnU5oFXuex4W/ceiSSxwlVmJn5yNvV1dRSmWaNje/kMvlWFicWxOz82WTz+eRUlpFDx/cpVgsMjKS50zmqTrFGDBa8WHrM9VqPWXw7OkSxmQ9c3zs02w2EOd8ADB9f4pqtS7d1DuGVutbX42O42RiWmsODnyAIxeg/fsno6MFi8XZVpuY+RsTHB76AL54vLy0tb8vJ9PJA62P44geBobh4ctHWutF/hd/AExBukCW3MYjAAAAAElFTkSuQmCC);
+    background-repeat: no-repeat;
+    float: left;
+    width: 16px;
+    height: 16px;
+    display: block; }
