@@ -260,7 +260,7 @@ module Butternut
         link = step.at("a")
         link.should_not be_nil
         file = link['href']
-        file.should match(%r{^\.\./features/#{Date.today.to_s}/butternut.+\.html})
+        file.should match(%r{^/features/#{Date.today.to_s}/butternut.+\.html})
       end
 
       it "saves images and stylesheets and rewrites urls in page source" do

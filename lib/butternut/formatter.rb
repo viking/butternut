@@ -13,7 +13,8 @@ module Butternut
 
     # FIXME: this is obviously not nominal, but I have no way of
     #        accepting additional options from Cucumber at present
-    FEATURES_DIR_PARTS = %w{.. features}
+    FEATURES_DIR_PARTS  = %w{.. features}
+    FEATURES_HTML_PREFIX = "/features"
 
     def initialize(step_mother, io, options)
       @io = io
@@ -31,7 +32,7 @@ module Butternut
             today = Date.today.to_s
 
             @source_output_dir = File.join(features_dir, today)
-            @source_html_path  = (FEATURES_DIR_PARTS + [today]).join("/")
+            @source_html_path  = FEATURES_HTML_PREFIX + "/" + today
             if !File.exist?(@source_output_dir)
               FileUtils.mkdir(@source_output_dir)
             end
