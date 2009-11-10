@@ -12,6 +12,12 @@ module Butternut
       end
     end
 
+    Spec::Matchers.define :be_an_existing_file do
+      match do |filename|
+        File.exist?(filename)
+      end
+    end
+
     def setup_formatter(options = {})
       @out = StringIO.new
       @formatter = Butternut::Formatter.new(step_mother, @out, options)
@@ -232,15 +238,15 @@ module Butternut
 
     describe "displaying page source to file" do
       before(:each) do
-        @tmpdir = File.join(File.dirname(__FILE__), "..", "..", "tmp")
+        dir = File.join(File.dirname(__FILE__), "..", "..", "tmp")
         setup_formatter({:formats => [
-          ['Butternut::Formatter', File.join(@tmpdir, "main", "huge.html")]
+          ['Butternut::Formatter', File.join(dir, "main", "huge.html")]
         ]})
         run_defined_feature
         @doc = Nokogiri.HTML(@out.string)
 
-        dir = File.join(@tmpdir, "features", Date.today.to_s)
-        file = most_recent_html_file(dir)
+        @tmp_dir = File.join(dir, "features", Date.today.to_s)
+        file = most_recent_html_file(@tmp_dir)
         @page_doc = Nokogiri.HTML(open(file).read)
       end
 
@@ -265,8 +271,19 @@ module Butternut
 
       it "saves images and stylesheets and rewrites urls in page source" do
         @page_doc.at('img:nth(1)')['src'].should == "picard.jpg"
+        File.join(@tmp_dir, "picard.jpg").should be_an_existing_file
+
         @page_doc.at('link:nth(1)[rel="stylesheet"]')['href'].should == "foo.css"
+        File.join(@tmp_dir, "foo.css").should be_an_existing_file
+
         @page_doc.at('link:nth(2)[rel="stylesheet"]')['href'].should == "bar.css"
+        File.join(@tmp_dir, "bar.css").should be_an_existing_file
+      end
+
+      it "saves assets and rewrites urls referred to by stylesheets" do
+        foo = open(File.join(@tmp_dir, "foo.css")).read
+        foo.should include("url(facepalm.jpg)")
+        File.join(@tmp_dir, "facepalm.jpg").should be_an_existing_file
       end
 
       it "turns off links" do

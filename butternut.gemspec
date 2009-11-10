@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{butternut}
-  s.version = "0.0.1"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jeremy Stephens"]
@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
      "spec/butternut/helpers_spec.rb",
      "spec/butternut_spec.rb",
      "spec/fixtures/css/bar.css",
+     "spec/fixtures/facepalm.jpg",
      "spec/fixtures/foo.css",
      "spec/fixtures/foo.html",
      "spec/fixtures/foo.js",

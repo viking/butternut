@@ -33,7 +33,7 @@ Spec::Rake::SpecTask.new(:rcov) do |spec|
   spec.rcov = true
 end
 
-task :spec => :check_dependencies
+task :spec => [:check_dependencies, "tmp:clear"]
 
 task :default => :spec
 
@@ -50,4 +50,12 @@ end
 desc 'Generate the css for the html formatter from sass'
 task :sass do
   sh 'sass -t expanded lib/butternut/cucumber.sass > lib/butternut/cucumber.css'
+end
+
+namespace :tmp do
+  desc 'Delete temporary files'
+  task :clear do
+    require 'fileutils'
+    FileUtils.rm_rf(Dir.glob(File.dirname(__FILE__) + "/tmp/features/*"), :verbose => true)
+  end
 end

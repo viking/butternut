@@ -416,39 +416,25 @@ module Butternut
     end
 
     def transform_page_source(page_source, page_url)
-      page_base_uri = URI.parse(page_url)
-      page_base_uri.query = nil
-      already_collected = []
+      base_uri = URI.parse(page_url)
+      base_uri.query = nil
+      @already_collected = []
 
       doc = Nokogiri.HTML(page_source)
-      { 'img' => 'src',
-        'link[rel=stylesheet]' => 'href'
-      }.each_pair do |selector, attr|
+      { :image      => ['img', 'src'],
+        :stylesheet => ['link[rel=stylesheet]', 'href']
+      }.each_pair do |type, (selector, attr)|
         doc.css(selector).each do |elt|
           elt_url = elt[attr]
           next  if elt_url.nil? || elt_url.empty?
-          elt_uri = URI.parse(elt_url)
 
-          remote_file = (elt_uri.absolute? ? elt_uri : page_base_uri.merge(elt_uri)).to_s
-          next  if already_collected.include?(remote_file)
-
-          # FIXME: two different files could have the same basename :)
-          basename   = File.basename(elt_uri.path)
-          local_file = File.join(@source_output_dir, basename)
-          begin
-            File.open(local_file, "w") { |f| f.write open(remote_file).read }
-            already_collected << remote_file
-
-            elt[attr] = basename
-          rescue Errno::ENOENT, OpenURI::HTTPError, Net::FTPPermError
-          end
+          result = save_remote_file(base_uri, type, elt_url)
+          elt[attr] = result  if result
         end
       end
 
       # disable links
-      doc.css('a').each do |link|
-        link['href'] = "#"
-      end
+      doc.css('a').each { |link| link['href'] = "#" }
 
       # turn off scripts
       doc.css('script').each { |s| s.unlink }
@@ -457,6 +443,33 @@ module Butternut
       doc.css('input, select, textarea').each { |x| x['disabled'] = 'disabled' }
 
       doc.to_s
+    end
+
+    def transform_stylesheet(stylesheet_uri, content)
+      content.gsub(%r{url\(([^\)]+)\)}) do |_|
+        result = save_remote_file(stylesheet_uri, :image, $1)
+        "url(#{result || $1})"
+      end
+    end
+
+    def save_remote_file(base_uri, type, url)
+      # FIXME: two different files could have the same basename :)
+      uri = URI.parse(url)
+      remote_uri = uri.absolute? ? uri : base_uri.merge(uri)
+      basename   = File.basename(uri.path)
+
+      unless @already_collected.include?(remote_uri)
+        begin
+          content = open(remote_uri.to_s).read
+          content = transform_stylesheet(remote_uri, content) if type == :stylesheet
+          local_path = File.join(@source_output_dir, basename)
+          File.open(local_path, "w") { |f| f.write(content) }
+          @already_collected << remote_uri
+        rescue Errno::ENOENT, OpenURI::HTTPError, Net::FTPPermError
+          return nil
+        end
+      end
+      basename
     end
   end
 end
