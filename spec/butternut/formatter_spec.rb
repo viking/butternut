@@ -265,7 +265,8 @@ module Butternut
 
       it "saves images and stylesheets and rewrites urls in page source" do
         @page_doc.at('img')['src'].should == "picard.jpg"
-        @page_doc.at('link[rel="stylesheet"]')['href'].should == "foo.css"
+        @page_doc.at('link:first[rel="stylesheet"]')['href'].should == "foo.css"
+        @page_doc.at('link:last[rel="stylesheet"]')['href'].should == "bar.css"
       end
 
       it "turns off links" do

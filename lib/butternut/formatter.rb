@@ -416,9 +416,6 @@ module Butternut
     def transform_page_source(page_source, page_url)
       page_uri = URI.parse(page_url)
       page_uri.query = nil
-      page_uri.path = File.dirname(page_uri.path)
-      page_url = page_uri.to_s
-
       collected_files = []
 
       doc = Nokogiri.HTML(page_source)
@@ -437,9 +434,10 @@ module Butternut
           local_file  = File.join(@source_output_dir, basename)
           remote_file = case elt_url
                         when %r{^\w+://} then elt_url
+                        when %r{^/} then
+                          "#{page_uri.scheme}://#{page_uri.host}:#{page_uri.port}#{elt_url}"
                         else
-                          elt_url.sub!(/^\//, "")
-                          page_url + "/" + elt_url
+                          page_url.to_s + "/" + elt_url
                         end
           File.open(local_file, "w") { |f| f.write open(remote_file).read }
           collected_files << elt_url
