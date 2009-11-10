@@ -264,9 +264,9 @@ module Butternut
       end
 
       it "saves images and stylesheets and rewrites urls in page source" do
-        @page_doc.at('img')['src'].should == "picard.jpg"
-        @page_doc.at('link:first[rel="stylesheet"]')['href'].should == "foo.css"
-        @page_doc.at('link:last[rel="stylesheet"]')['href'].should == "bar.css"
+        @page_doc.at('img:nth(1)')['src'].should == "picard.jpg"
+        @page_doc.at('link:nth(1)[rel="stylesheet"]')['href'].should == "foo.css"
+        @page_doc.at('link:nth(2)[rel="stylesheet"]')['href'].should == "bar.css"
       end
 
       it "turns off links" do
@@ -283,6 +283,18 @@ module Butternut
         @page_doc.css('input, select, textarea').each do |elt|
           elt['disabled'].should == "disabled"
         end
+      end
+
+      it "handles Errno::ENOENT" do
+        @page_doc.at('img:nth(2)')['src'].should == "/roflpwnage/missing_file_omg.gif"
+      end
+
+      it "handles OpenURI::HTTPError" do
+        @page_doc.at('img:nth(3)')['src'].should == "http://google.com/missing_file_omg.gif"
+      end
+
+      it "handles Net::FTPPermError" do
+        @page_doc.at('img:nth(4)')['src'].should == "ftp://mirror.anl.gov/missing_file_omg.gif"
       end
     end
   end

@@ -1,10 +1,12 @@
 require 'cucumber/formatter/ordered_xml_markup'
 require 'cucumber/formatter/duration'
+
 require 'tmpdir'
 require 'fileutils'
 require 'nokogiri'
 require 'uri'
 require 'open-uri'
+require 'net/ftp'   # For Net::FTPPermError
 
 module Butternut
   class Formatter
@@ -414,9 +416,9 @@ module Butternut
     end
 
     def transform_page_source(page_source, page_url)
-      page_uri = URI.parse(page_url)
-      page_uri.query = nil
-      collected_files = []
+      page_base_uri = URI.parse(page_url)
+      page_base_uri.query = nil
+      already_collected = []
 
       doc = Nokogiri.HTML(page_source)
       { 'img' => 'src',
@@ -424,25 +426,22 @@ module Butternut
       }.each_pair do |selector, attr|
         doc.css(selector).each do |elt|
           elt_url = elt[attr]
-          next  if elt_url.nil?
+          next  if elt_url.nil? || elt_url.empty?
+          elt_uri = URI.parse(elt_url)
 
-          elt_url.gsub!('\\"', "")
-          next  if elt_url.empty?
-          next  if collected_files.index(elt_url)
+          remote_file = (elt_uri.absolute? ? elt_uri : page_base_uri.merge(elt_uri)).to_s
+          next  if already_collected.include?(remote_file)
 
-          basename    = File.basename(elt_url)
-          local_file  = File.join(@source_output_dir, basename)
-          remote_file = case elt_url
-                        when %r{^\w+://} then elt_url
-                        when %r{^/} then
-                          "#{page_uri.scheme}://#{page_uri.host}:#{page_uri.port}#{elt_url}"
-                        else
-                          page_url.to_s + "/" + elt_url
-                        end
-          File.open(local_file, "w") { |f| f.write open(remote_file).read }
-          collected_files << elt_url
+          # FIXME: two different files could have the same basename :)
+          basename   = File.basename(elt_uri.path)
+          local_file = File.join(@source_output_dir, basename)
+          begin
+            File.open(local_file, "w") { |f| f.write open(remote_file).read }
+            already_collected << remote_file
 
-          elt[attr] = basename
+            elt[attr] = basename
+          rescue Errno::ENOENT, OpenURI::HTTPError, Net::FTPPermError
+          end
         end
       end
 
