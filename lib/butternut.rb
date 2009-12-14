@@ -6,20 +6,15 @@ module Butternut
   def self.setup_hooks(obj)
     obj.instance_exec do
       AfterStep do |object|
-        begin
-          if object.is_a?(Cucumber::Ast::Scenario)
-            if page_changed?
-              object.last_page_source = current_page_source
-              object.last_page_url    = current_url
-            else
-              object.last_page_source = nil
-              object.last_page_url    = nil
-            end
-            @page_changed = false
+        if object.is_a?(Cucumber::Ast::Scenario)
+          if page_changed?
+            object.last_page_source = current_page_source
+            object.last_page_url    = current_url
+          else
+            object.last_page_source = nil
+            object.last_page_url    = nil
           end
-        rescue Exception => e
-          p e
-          pp caller
+          @page_changed = false
         end
       end
     end

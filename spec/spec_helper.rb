@@ -2,7 +2,7 @@ require 'rubygems'
 gem 'rspec'
 require 'spec'
 require 'spec/autorun'
-require 'ruby-debug'
+require 'fileutils'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -70,6 +70,25 @@ module SpecHelper
     end
   end
 end
+
+FIXTURE_DIR = File.expand_path(File.join(File.dirname(__FILE__), "fixtures"))
+
+Spec::Matchers.define :be_an_existing_file do
+  match { |filename| File.exist?(filename) }
+end
+
+Spec::Matchers.define :be_an_existing_directory do
+  match { |filename| File.directory?(filename) }
+end
+
+Spec::Matchers.define :match_content_of do |expected|
+  match do |actual|
+    raise "expected file doesn't exist" unless File.exist?(expected)
+    raise "actual file doesn't exist"   unless File.exist?(actual)
+    open(expected).read == open(actual).read
+  end
+end
+
 
 Spec::Runner.configure do |config|
   config.before(:each) do

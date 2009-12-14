@@ -23,6 +23,7 @@ end
 
 require 'spec/rake/spectask'
 Spec::Rake::SpecTask.new(:spec) do |spec|
+  spec.ruby_opts = %w{-X+O}
   spec.libs << 'lib' << 'spec'
   spec.spec_files = FileList['spec/**/*_spec.rb']
 end
@@ -56,6 +57,6 @@ namespace :tmp do
   desc 'Delete temporary files'
   task :clear do
     require 'fileutils'
-    FileUtils.rm_rf(Dir.glob(File.dirname(__FILE__) + "/tmp/features/*"), :verbose => true)
+    FileUtils.rm_rf(Dir.glob(File.dirname(__FILE__) + "/tmp/*"))
   end
 end
