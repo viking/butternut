@@ -111,9 +111,9 @@ module Butternut
         end
 
         it "turns off links" do
-          @page_doc.css('a').each do |link|
-            link['href'].should == "#"
-          end
+          link = @page_doc.at('a')
+          link['href'].should == "#"
+          link.inner_html.should == "Picard song"
         end
 
         it "turns off scripts" do
