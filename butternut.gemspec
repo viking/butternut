@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{butternut}
-  s.version = "0.2.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jeremy Stephens"]
-  s.date = %q{2009-12-14}
+  s.date = %q{2009-12-15}
   s.description = %q{Based on Cucumber's HTML formatter, Butternut uses Celerity to capture page sources after each step.}
   s.email = %q{viking415@gmail.com}
   s.extra_rdoc_files = [
@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
      "spec/butternut/formatter_spec.rb",
      "spec/butternut/helpers_spec.rb",
      "spec/butternut_spec.rb",
+     "spec/fixtures/blargh.html",
      "spec/fixtures/css/bar.css",
      "spec/fixtures/facepalm.jpg",
      "spec/fixtures/foo.css",
