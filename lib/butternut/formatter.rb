@@ -37,12 +37,16 @@ module Butternut
     end
 
     def after_step_result(keyword, step_match, multiline_arg, status, exception, source_indent, background)
-      stop_buffering :step_result
       return if @hide_this_step
-      builder.li(:id => @step_id, :class => "step #{status}") do
-        add_page_source_link(builder)
-        builder << buffer(:step_result)
+      # print snippet for undefined steps
+      if status == :undefined
+        step_multiline_class = @step.multiline_arg ? @step.multiline_arg.class : nil
+        @builder.pre do |pre|
+          pre << @step_mother.snippet_text(@step.actual_keyword,step_match.instance_variable_get("@name") || '',step_multiline_class)
+        end
       end
+      add_page_source_link(@builder)
+      @builder << '</li>'
     end
 
     private
@@ -61,10 +65,8 @@ module Butternut
         path = source_file_name
         File.open(path, "w") { |f| f.print(page_source) }
 
-        builder.div(:style => "float: right") do
-          builder.a({:target => "_blank", :href => "#{@assets_url}/#{File.basename(path)}"}) do
-            builder << "Source"
-          end
+        builder.a({:target => "_blank", :href => "#{@assets_url}/#{File.basename(path)}"}) do
+          builder << "Source"
         end
       end
 

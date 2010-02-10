@@ -10,7 +10,8 @@ begin
     gem.email = "viking415@gmail.com"
     gem.homepage = "http://github.com/viking/butternut"
     gem.authors = ["Jeremy Stephens"]
-    gem.add_dependency "cucumber", ">= 0.4.0"
+    gem.platform = "java"
+    gem.add_dependency "cucumber", ">= 0.6.0"
     gem.add_dependency "celerity"
     gem.add_dependency "nokogiri"
     gem.add_development_dependency "rspec", ">= 1.2.9"
